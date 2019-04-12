@@ -149,28 +149,6 @@ class TSPSolver:
 		results['total'] = self.totalStates
 		results['pruned'] = self.prunedStates
 		return results
-					
-
-	''' <summary>
-		This is the entry point for the algorithm you'll write for your group project.
-		</summary>
-		<returns>results dictionary for GUI that contains three ints: cost of best solution, 
-		time spent to find best solution, total number of solutions found during search, the 
-		best solution found.  You may use the other three field however you like.
-		algorithm</returns> 
-	'''
-		
-	def fancy( self,time_allowance=60.0 ):
-		pass
-		
-	def makeMatrix(self, cities): # make the first matrix for the set of cities
-		matrix = []
-		for i in range(len(cities)):
-			matrix.append([])
-			for j in range(len(cities)):
-				matrix[i].append(cities[i].costTo(cities[j]))
-
-		return matrix
 
 	# expand given problem into more problems
 	#  TIME COMPLEXITY: O(n^2), n represents number of cities in the graph. Given a problem's
@@ -212,6 +190,68 @@ class TSPSolver:
 	'''
 
 	def greedy( self,time_allowance=60.0 ):
+		results = {}
+		start_time = time.time()
+		cities = self._scenario.getCities()
+		matrix = self.makeMatrix(cities)
+		tours = []
+
+		for i in range(len(cities)):
+			path = []
+			path.append(cities[i])
+			current = cities[i]
+			while len(path) != len(cities): # iterate through each node
+				smallest = float("inf")
+				newCity = None
+				for j in cities: # find smallest path
+					if j not in path and matrix[current._index][j._index] < smallest:
+						smallest = matrix[current._index][j._index]
+						newCity = j
+				if newCity is None: # if there is no possible connection
+					break # specific tour should return inf cost
+				path.append(newCity)
+				current = newCity
+			tours.append(path)
+
+		finalPath = None
+		smallestTour = float("inf")
+		for i in range(len(tours)):
+			if len(tours[i]) == len(cities) and TSPSolution(tours[i]).cost < smallestTour:
+				smallestTour = TSPSolution(tours[i]).cost
+				finalPath = tours[i]
+
+		if finalPath is None:
+			return None
+
+		end_time = time.time()
+		results['cost'] = TSPSolution(finalPath).cost
+		results['time'] = end_time - start_time
+		results['count'] = len(finalPath)
+		results['soln'] = TSPSolution(finalPath)
+		results['max'] = 0
+		results['total'] = 0
+		results['pruned'] = 0
+		return results
+
+	def makeMatrix(self, cities): # make the first matrix for the set of cities
+		matrix = []
+		for i in range(len(cities)):
+			matrix.append([])
+			for j in range(len(cities)):
+				matrix[i].append(cities[i].costTo(cities[j]))
+
+		return matrix
+	
+	''' <summary>
+		This is the entry point for the algorithm you'll write for your group project.
+		</summary>
+		<returns>results dictionary for GUI that contains three ints: cost of best solution, 
+		time spent to find best solution, total number of solutions found during search, the 
+		best solution found.  You may use the other three field however you like.
+		algorithm</returns> 
+	'''
+		
+	def fancy( self,time_allowance=60.0 ):
 		pass
 		# create matrix, array (path array)
 		# while len(array1) != 1:
