@@ -72,30 +72,6 @@ class TSPSolver:
 		results['pruned'] = None
 		return results
 
-	''' <summary>
-		This is the entry point for the greedy solver, which you must implement for 
-		the group project (but it is probably a good idea to just do it for the branch-and
-		bound project as a way to get your feet wet).  Note this could be used to find your
-		initial BSSF.
-		</summary>
-		<returns>results dictionary for GUI that contains three ints: cost of best solution, 
-		time spent to find best solution, total number of solutions found, the best
-		solution found, and three null values for fields not used for this 
-		algorithm</returns> 
-	'''
-
-	def greedy( self,time_allowance=60.0 ):
-		pass
-	
-	''' <summary>
-		This is the entry point for the branch-and-bound algorithm that you will implement
-		</summary>
-		<returns>results dictionary for GUI that contains three ints: cost of best solution, 
-		time spent to find best solution, total number solutions found during search (does
-		not include the initial BSSF), the best solution found, and three more ints: 
-		max queue size, total number of states created, and number of pruned states.</returns> 
-	'''
-		
 	# b, number of subproblems a subproblem can generate when expanded
 	# n, number of cities
 	#  TIME COMPLEXITY: O(n^2*b^2), b^2 comes from two loops, a while loop and a for
@@ -222,3 +198,68 @@ class TSPSolver:
 
 				listProblems.append(newProblem)
 		return listProblems
+
+	''' <summary>
+		This is the entry point for the greedy solver, which you must implement for 
+		the group project (but it is probably a good idea to just do it for the branch-and
+		bound project as a way to get your feet wet).  Note this could be used to find your
+		initial BSSF.
+		</summary>
+		<returns>results dictionary for GUI that contains three ints: cost of best solution, 
+		time spent to find best solution, total number of solutions found, the best
+		solution found, and three null values for fields not used for this 
+		algorithm</returns> 
+	'''
+
+	def greedy( self,time_allowance=60.0 ):
+		pass
+		# create matrix, array (path array)
+		# while len(array1) != 1:
+		# array1 = self.combine(array1)
+
+	# def combine(array1):
+	# 	while len(array1) != 0:
+	#		city1, city2, edge = minEdgeInMatrix()
+	#		shape1, shape2 = findShapes(map)
+	#		bestCost = ("inf", cities[]) --> clockwise
+	#		for i in shape1
+	#			for j in shape2
+	#				pCost = matrix[i][j] + [i+1][j+1]-[i][i+1]-[j][j+1]
+	#				cCost = [i][j+1]+[i+1][j] - 
+	#				if pCost or CCost < bestCost
+	#					assign to bestCost
+	#		newShape = clockwise(bestCost.cities)
+	#		update matrix and map
+	#		array2.push(newShape)
+	#	return array2
+
+	def minEdgeInMatrix(self):
+		pass
+		#	https://docs.scipy.org/doc/numpy/reference/generated/numpy.argmin.html
+
+	# take two cities, 
+	def findShapes(self, city1, city2):
+		pass
+		# for city in old path
+		#	map(city, new path)
+
+	# 
+	def clockwise(self, i1, i2, i3, i4, path1, path2):
+		pass
+		# if (1 and 2 consecutive and 3 and 4 !consecutive) || (1 and 2 !consecutive and 3 and 4 consecutive)
+		#	take path2- reverse
+		
+		#	
+		# if 1 and 2 consecutive
+		#	return
+
+	''' <summary>
+		This is the entry point for the branch-and-bound algorithm that you will implement
+		</summary>
+		<returns>results dictionary for GUI that contains three ints: cost of best solution, 
+		time spent to find best solution, total number solutions found during search (does
+		not include the initial BSSF), the best solution found, and three more ints: 
+		max queue size, total number of states created, and number of pruned states.</returns> 
+	'''
+		
+	
