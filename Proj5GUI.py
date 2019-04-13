@@ -12,9 +12,6 @@ if PYQT_VER == 'PYQT5':
 	from PyQt5.QtWidgets import *
 	from PyQt5.QtGui import *
 	from PyQt5.QtCore import *
-elif PYQT_VER == 'PYQT4':
-	from PyQt4.QtGui import *
-	from PyQt4.QtCore import *
 else:
 	raise Exception('Unsupported Version of PyQt: {}'.format(PYQT_VER))
 

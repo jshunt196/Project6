@@ -278,8 +278,8 @@ class TSPSolver:
     def combine(self, array1):
         array2 = []
         temp_matrix = self.inf_matrix.copy()
-        while len(array1) != 0:
-            city1, city2 = self.minEdgeInMatrix()
+        while len(array1) > 1:
+            city1, city2 = self.minEdgeInMatrix(temp_matrix)
             path1, path2 = self.findPaths(city1, city2)
             if not(path1 in array1 and path2 in array1) or path1 is path2:
                 temp_matrix[city1][city2] = np.inf
@@ -291,10 +291,7 @@ class TSPSolver:
                 nexti = (i+1) % len1
                 for j in range(len(path2)):
                     nextj = (j+1) % len2
-                    cost = (self.matrix[path1[i]._index][path2[nextj]._index] +
-                            self.matrix[path1[nexti]._index][path2[j]._index] -
-                            self.matrix[path1[i]._index][path1[nexti]._index] -
-                            self.matrix[path2[j]._index][path2[nextj]._index])
+                    cost = (self.matrix[path1[i]._index][path2[nextj]._index] + self.matrix[path1[nexti]._index][path2[j]._index] - self.matrix[path1[i]._index][path1[nexti]._index] - self.matrix[path2[j]._index][path2[nextj]._index])
                     if cost < bestCost[0]:
                         bestCost = (cost, (i, nexti, j, nextj))
             if bestCost[0] is np.inf:
@@ -305,16 +302,21 @@ class TSPSolver:
             new_path += path2[:bestCost[1][3]]
             new_path += path1[bestCost[1][0]:]
             array2.append(new_path)
+            array1.remove(path1)
+            array1.remove(path2)
             for city in new_path:
                 self.map[city._index] = new_path
             for city1 in new_path:
                 for city2 in new_path:
                     self.inf_matrix[city1._index][city2._index] = np.inf
+        if len(array1) is 1:
+            array2 += array1
+            return array2
         return array2
 
-    def minEdgeInMatrix(self):
+    def minEdgeInMatrix(self, matrix):
         ind = np.unravel_index(
-            np.argmin(self.inf_matrix), self.inf_matrix.shape)
+            np.argmin(matrix), matrix.shape)
         city1 = ind[0]
         city2 = ind[1]
         return city1, city2
