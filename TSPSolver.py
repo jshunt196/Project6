@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# test
 
 import copy
 import itertools
@@ -251,6 +250,7 @@ class TSPSolver:
     def fancy(self, time_allowance=60.0):
         start_time = time.time()
         cities = self._scenario.getCities()
+        tours = []
         self.matrix = np.zeros((len(cities), len(cities)))
         for i in range(len(cities)):
             for j in range(len(cities)):
@@ -262,15 +262,29 @@ class TSPSolver:
             path = [cities[i]]
             array1.append(path)
             self.map[i] = path
-        while len(array1) > 1:
-            array1 = self.combine(array1)
+        # print(f"Array1: {array1}")
+        for i in range(len(cities)):
+            initPath = array1.pop()
+            array1.insert(0, initPath)
+            queue = array1.copy()
+            while len(queue) > 1:
+                queue = self.combine(queue)
+            if queue[0] is not None:
+                tours.append(TSPSolution(queue[0]))
+            # print(f"Possible solution: {queue[0]}")
+        # print(f"Tours: {tours}c")
+        bssf = tours[0]
+        for tour in tours:
+            if tour.cost < bssf.cost:
+                bssf = tour
+                # print("BSSF updated")
         end_time = time.time()
 
         results = {}
-        results['cost'] = TSPSolution(array1[0]).cost
+        results['cost'] = bssf.cost
         results['time'] = end_time - start_time
         results['count'] = 0
-        results['soln'] = TSPSolution(array1[0])
+        results['soln'] = bssf
         results['max'] = 0
         results['total'] = 0
         results['pruned'] = 0
@@ -278,33 +292,22 @@ class TSPSolver:
 
     def combine(self, array1):
         array2 = []
-        temp_matrix = self.inf_matrix.copy()
+        # temp_matrix = self.inf_matrix.copy()
         while len(array1) != 0:
-            city1, city2 = self.minEdgeInMatrix()
-            path1, path2 = self.findPaths(city1, city2)
-            if not(path1 in array1 and path2 in array1) or path1 is path2:
-                temp_matrix[city1][city2] = np.inf
-                continue
-            bestCost = (np.inf, [])
-            len1 = len(path1)
-            len2 = len(path2)
-            for i in range(len(path1)):
-                nexti = (i+1) % len1
-                for j in range(len(path2)):
-                    nextj = (j+1) % len2
-                    cost = (self.matrix[path1[i]._index][path2[nextj]._index] +
-                            self.matrix[path1[nexti]._index][path2[j]._index] -
-                            self.matrix[path1[i]._index][path1[nexti]._index] -
-                            self.matrix[path2[j]._index][path2[nextj]._index])
-                    if cost < bestCost[0]:
-                        bestCost = (cost, (i, nexti, j, nextj))
-            if bestCost[0] is np.inf:
-                temp_matrix[city1][city2] = np.inf
-                continue
-            new_path = path1[:bestCost[1][0]]
-            new_path += path2[bestCost[1][3]:]
-            new_path += path2[:bestCost[1][3]]
-            new_path += path1[bestCost[1][0]:]
+            if len(array1) is 1:
+                array2 += array1
+                return array2
+            path1 = array1.pop()
+            bestCost, path2, i, nexti, j, nextj = self.pathEndpoints(
+                path1, array1)
+            if bestCost is np.inf:
+                return [None]
+            # print(path2)
+            array1.remove(path2)
+            new_path = path1[:i]
+            new_path += path2[nextj:]
+            new_path += path2[:nextj]
+            new_path += path1[i:]
             array2.append(new_path)
             for city in new_path:
                 self.map[city._index] = new_path
@@ -321,7 +324,26 @@ class TSPSolver:
         return city1, city2
         #	https://docs.scipy.org/doc/numpy/reference/generated/numpy.argmin.html
 
-    # take two cities,
+    def pathEndpoints(self, path, destPaths):
+        best = (np.inf, [], -1, -1, -1, -1)
+        for i in range(len(path)):
+            nexti = (i+1) % len(path)
+            for destPath in destPaths:
+                for j in range(len(destPath)):
+                    nextj = (j+1) % len(destPath)
+                    # cost = city.costTo(dest)
+                    len1 = len(path)
+                    len2 = len(destPath)
+                    cost = (self.matrix[path[i]._index][destPath[nextj]._index] +
+                            self.matrix[path[nexti]._index][destPath[j]._index] -
+                            self.matrix[path[i]._index][path[nexti]._index] -
+                            self.matrix[destPath[j]._index][destPath[nextj]._index])
+                    if cost < best[0]:
+                        best = (cost, destPath, i, nexti, j, nextj)
+        return best
+
+        # take two cities,
+
     def findPaths(self, city1, city2):
         return self.map[city1], self.map[city2]
 
